@@ -8,6 +8,7 @@ main = "src/index.ts"                 # entry point for the worker
 # Dashboard. It also specifies the first element of the default URL that
 # will reach your worker.
 name = "decap-proxy"
+keep_vars = true
 
 # optional: uncomment and alter the following lines if using a custom domain.
 #
