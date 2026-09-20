@@ -17,8 +17,6 @@ function randomHex(bytes: number): string {
 		.join('');
 }
 
-const GITHUB_OAUTH_CLIENT_ID_FALLBACK = 'Ov23Ii3SQqSOZU16Wjcw';
-
 const cleanEnvValue = (value?: string) => {
   const cleaned = (value || '').trim();
   if (!cleaned) return '';
@@ -30,8 +28,7 @@ const getOAuthConfig = (env: Env) => {
   const id =
     cleanEnvValue(env.GITHUB_OAUTH_ID) ||
     cleanEnvValue(env.GITHUB_OAUTH_CLIENT_ID) ||
-    cleanEnvValue(env.GITHUB_CLIENT_ID) ||
-    GITHUB_OAUTH_CLIENT_ID_FALLBACK;
+    cleanEnvValue(env.GITHUB_CLIENT_ID);
 
   const secret =
     cleanEnvValue(env.GITHUB_OAUTH_SECRET) ||
@@ -87,6 +84,7 @@ const createOAuth = (env: Env) => {
 const handleAuth = async (url: URL, env: Env) => {
   const { id, secret } = getOAuthConfig(env);
   const missing = [];
+  if (!id) missing.push('GITHUB_OAUTH_ID');
   if (!secret) missing.push('GITHUB_OAUTH_SECRET');
   if (missing.length) return configErrorResponse(missing);
 
@@ -146,6 +144,7 @@ const callbackScriptResponse = (status: string, token: string) => {
 const handleCallback = async (url: URL, env: Env) => {
   const { id, secret } = getOAuthConfig(env);
   const missing = [];
+  if (!id) missing.push('GITHUB_OAUTH_ID');
   if (!secret) missing.push('GITHUB_OAUTH_SECRET');
   if (missing.length) return configErrorResponse(missing);
 
