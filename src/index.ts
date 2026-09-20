@@ -180,9 +180,11 @@ export default {
 			const oauth = getOAuthConfig(env);
 			return Response.json({
 				status: 'ok',
-				version: 'oauth-v2',
+				version: 'oauth-v3',
+				clientId: oauth.id,
 				clientIdConfigured: Boolean(oauth.id),
 				clientIdIsUndefined: oauth.id.toLowerCase() === 'undefined',
+				redirectUri: `https://${url.hostname}/callback?provider=github`,
 				secretConfigured: Boolean(oauth.secret),
 				repoPrivate: env.GITHUB_REPO_PRIVATE != undefined && env.GITHUB_REPO_PRIVATE !== '0',
 			}, {
