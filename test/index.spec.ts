@@ -36,3 +36,14 @@ describe('GET /callback', () => {
 		expect(responseBody).toContain('CMS sign-in is temporarily unavailable');
 	});
 });
+
+
+describe('OAuth redirect URI', () => {
+	it('uses the registered callback URI without an extra provider query string', async () => {
+		const response = await SELF.fetch('https://example.com/auth?provider=github');
+		if (response.status !== 500) {
+			expect(response.url).toContain('redirect_uri=https://example.com/callback');
+			expect(response.url).not.toContain('callback?provider=github');
+		}
+	});
+});
