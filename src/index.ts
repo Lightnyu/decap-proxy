@@ -1,8 +1,11 @@
 import { OAuthClient } from './oauth';
 
 interface Env {
-	GITHUB_OAUTH_ID: string;
-	GITHUB_OAUTH_SECRET: string;
+  GITHUB_OAUTH_ID?: string;
+  GITHUB_OAUTH_CLIENT_ID?: string;
+  GITHUB_CLIENT_ID?: string;
+  GITHUB_OAUTH_SECRET?: string;
+  GITHUB_CLIENT_SECRET?: string;
   GITHUB_REPO_PRIVATE?: string;
 }
 
@@ -14,10 +17,57 @@ function randomHex(bytes: number): string {
 		.join('');
 }
 
+const getOAuthConfig = (env: Env) => {
+  const id =
+    env.GITHUB_OAUTH_ID ||
+    env.GITHUB_OAUTH_CLIENT_ID ||
+    env.GITHUB_CLIENT_ID ||
+    '';
+
+  const secret =
+    env.GITHUB_OAUTH_SECRET ||
+    env.GITHUB_CLIENT_SECRET ||
+    '';
+
+  return { id: id.trim(), secret: secret.trim() };
+};
+
+const configErrorResponse = (missing: string[]) => {
+  const items = missing.map(name => `<li><code>${name}</code></li>`).join('');
+  return new Response(
+    `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Bertoni CMS authentication configuration</title>
+  <style>
+    body{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f7f4ef;color:#252842;margin:0;padding:32px}
+    main{max-width:720px;margin:8vh auto;background:white;border:1px solid #ddd8d0;border-radius:18px;padding:28px;box-shadow:0 18px 60px rgba(30,33,58,.08)}
+    h1{font-size:26px;margin:0 0 12px}
+    p,li{line-height:1.55}
+    code{background:#f1eee9;padding:2px 6px;border-radius:6px}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>CMS sign-in is temporarily unavailable</h1>
+    <p>The authentication worker is running, but a required Cloudflare runtime setting is missing.</p>
+    <p>Missing configuration:</p>
+    <ul>${items}</ul>
+    <p>No GitHub login was started, so you will not be sent to a broken 404 page.</p>
+  </main>
+</body>
+</html>`,
+    { status: 500, headers: { 'Content-Type': 'text/html; charset=UTF-8', 'Cache-Control': 'no-store' } }
+  );
+};
+
 const createOAuth = (env: Env) => {
+  const { id, secret } = getOAuthConfig(env);
 	return new OAuthClient({
-		id: env.GITHUB_OAUTH_ID,
-		secret: env.GITHUB_OAUTH_SECRET,
+		id,
+		secret,
 		target: {
 			tokenHost: 'https://github.com',
 			tokenPath: '/login/oauth/access_token',
@@ -27,6 +77,12 @@ const createOAuth = (env: Env) => {
 };
 
 const handleAuth = async (url: URL, env: Env) => {
+  const { id, secret } = getOAuthConfig(env);
+  const missing = [];
+  if (!id) missing.push('GITHUB_OAUTH_ID');
+  if (!secret) missing.push('GITHUB_OAUTH_SECRET');
+  if (missing.length) return configErrorResponse(missing);
+
 	const provider = url.searchParams.get('provider');
 	if (provider !== 'github') {
 		return new Response('Invalid provider', { status: 400 });
@@ -72,6 +128,12 @@ const callbackScriptResponse = (status: string, token: string) => {
 };
 
 const handleCallback = async (url: URL, env: Env) => {
+  const { id, secret } = getOAuthConfig(env);
+  const missing = [];
+  if (!id) missing.push('GITHUB_OAUTH_ID');
+  if (!secret) missing.push('GITHUB_OAUTH_SECRET');
+  if (missing.length) return configErrorResponse(missing);
+
 	const provider = url.searchParams.get('provider');
 	if (provider !== 'github') {
 		return new Response('Invalid provider', { status: 400 });
