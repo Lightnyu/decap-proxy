@@ -22,7 +22,7 @@ describe('GET /auth', () => {
 			expect(responseBody).toContain('GITHUB_OAUTH_SECRET');
 			expect(responseBody).not.toContain('GITHUB_OAUTH_ID');
 		} else {
-			expect(response.url).toContain('client_id=Ov23Ii3SQqSOZU16Wjcw');
+			expect(response.url).toContain('client_id=Ov23li3SQqSOZU16Wjcw');
 			expect(response.url).not.toContain('client_id=undefined');
 		}
 	});
@@ -39,11 +39,10 @@ describe('GET /callback', () => {
 
 
 describe('OAuth redirect URI', () => {
-	it('uses the registered callback URI without an extra provider query string', async () => {
+	it('uses the exact registered callback URI including provider=github', async () => {
 		const response = await SELF.fetch('https://example.com/auth?provider=github');
 		if (response.status !== 500) {
-			expect(response.url).toContain('redirect_uri=https://example.com/callback');
-			expect(response.url).not.toContain('callback?provider=github');
+			expect(response.url).toContain('redirect_uri=https://example.com/callback?provider=github');
 		}
 	});
 });
