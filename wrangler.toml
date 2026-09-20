@@ -7,7 +7,7 @@ main = "src/index.ts"                 # entry point for the worker
 # The "name" parameter defines the name of the worker in your Cloudflare
 # Dashboard. It also specifies the first element of the default URL that
 # will reach your worker.
-name = "bertoni-cms-auth"
+name = "decap-proxy"
 
 # optional: uncomment and alter the following lines if using a custom domain.
 #
