@@ -19,19 +19,25 @@ function randomHex(bytes: number): string {
 
 const GITHUB_OAUTH_CLIENT_ID_FALLBACK = 'Ov23Ii3SQqSOZU16Wjcw';
 
+const cleanEnvValue = (value?: string) => {
+  const cleaned = (value || '').trim();
+  if (!cleaned) return '';
+  if (['undefined', 'null', 'none'].includes(cleaned.toLowerCase())) return '';
+  return cleaned;
+};
+
 const getOAuthConfig = (env: Env) => {
   const id =
-    env.GITHUB_OAUTH_ID ||
-    env.GITHUB_OAUTH_CLIENT_ID ||
-    env.GITHUB_CLIENT_ID ||
+    cleanEnvValue(env.GITHUB_OAUTH_ID) ||
+    cleanEnvValue(env.GITHUB_OAUTH_CLIENT_ID) ||
+    cleanEnvValue(env.GITHUB_CLIENT_ID) ||
     GITHUB_OAUTH_CLIENT_ID_FALLBACK;
 
   const secret =
-    env.GITHUB_OAUTH_SECRET ||
-    env.GITHUB_CLIENT_SECRET ||
-    '';
+    cleanEnvValue(env.GITHUB_OAUTH_SECRET) ||
+    cleanEnvValue(env.GITHUB_CLIENT_SECRET);
 
-  return { id: id.trim(), secret: secret.trim() };
+  return { id, secret };
 };
 
 const configErrorResponse = (missing: string[]) => {
