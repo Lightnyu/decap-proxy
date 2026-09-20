@@ -105,7 +105,16 @@ const handleAuth = async (url: URL, env: Env) => {
 		state: randomHex(4), // 4 bytes -> 8 hex chars
 	});
 
-	return new Response(null, { headers: { location: authorizationUri }, status: 301 });
+	return new Response(null, {
+		status: 302,
+		headers: {
+			location: authorizationUri,
+			'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+			Pragma: 'no-cache',
+			Expires: '0',
+			'X-Bertoni-OAuth-Version': '2',
+		},
+	});
 };
 
 const callbackScriptResponse = (status: string, token: string) => {
@@ -162,8 +171,21 @@ export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
 		const url = new URL(request.url);
     console.log(`url.pathname is ${url.pathname}`);
-		if (url.pathname === '/auth') {
+		if (url.pathname === '/auth' || url.pathname === '/auth-v2') {
 			return handleAuth(url, env);
+		}
+		if (url.pathname === '/health') {
+			const oauth = getOAuthConfig(env);
+			return Response.json({
+				status: 'ok',
+				version: 'oauth-v2',
+				clientIdConfigured: Boolean(oauth.id),
+				clientIdIsUndefined: oauth.id.toLowerCase() === 'undefined',
+				secretConfigured: Boolean(oauth.secret),
+				repoPrivate: env.GITHUB_REPO_PRIVATE != undefined && env.GITHUB_REPO_PRIVATE !== '0',
+			}, {
+				headers: { 'Cache-Control': 'no-store' }
+			});
 		}
 		if (url.pathname === '/callback') {
 			return handleCallback(url, env);
