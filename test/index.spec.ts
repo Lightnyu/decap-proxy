@@ -14,33 +14,21 @@ describe('GET /', () => {
 });
 
 describe('GET /auth', () => {
-	it('responds with redirected location', async () => {
+	it('fails clearly instead of redirecting with an undefined OAuth client ID', async () => {
 		const response = await SELF.fetch('https://example.com/auth?provider=github');
-		expect(response.status).toBe(200);
-		expect(response.url).toEqual(
-			expect.stringContaining(
-				'https://github.com/login/oauth/authorize?response_type=code&client_id=undefined&redirect_uri=https://example.com/callback?provider=github&scope=public_repo,user&state='
-			)
-		);
+		expect(response.status).toBe(500);
+		const responseBody = await response.text();
+		expect(responseBody).toContain('CMS sign-in is temporarily unavailable');
+		expect(responseBody).toContain('GITHUB_OAUTH_ID');
+		expect(responseBody).toContain('GITHUB_OAUTH_SECRET');
 	});
 });
 
 describe('GET /callback', () => {
-	it('responds with html page w/ JS messaging script', async () => {
-		vi.stubGlobal(
-			'fetch',
-			vi.fn(async () =>
-				new Response(JSON.stringify({ access_token: 'some-access-token' }), {
-					headers: { 'Content-Type': 'application/json' },
-				})
-			)
-		);
-
-		const response = await SELF.fetch(
-			'https://example.com/callback?provider=github&code=some-authorization-code'
-		);
-		expect(response.status).toBe(200);
+	it('fails clearly when OAuth runtime configuration is unavailable', async () => {
+		const response = await SELF.fetch('https://example.com/callback?provider=github&code=some-authorization-code');
+		expect(response.status).toBe(500);
 		const responseBody = await response.text();
-		expect(responseBody).toEqual(expect.stringContaining('window.opener.postMessage("authorizing:github", "*");'));
+		expect(responseBody).toContain('CMS sign-in is temporarily unavailable');
 	});
 });
