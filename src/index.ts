@@ -17,6 +17,8 @@ function randomHex(bytes: number): string {
 		.join('');
 }
 
+const GITHUB_OAUTH_CLIENT_ID_FALLBACK = 'Ov23li3SQqSOZU16Wjcw';
+
 const cleanEnvValue = (value?: string) => {
   const cleaned = (value || '').trim();
   if (!cleaned) return '';
@@ -28,7 +30,8 @@ const getOAuthConfig = (env: Env) => {
   const id =
     cleanEnvValue(env.GITHUB_OAUTH_ID) ||
     cleanEnvValue(env.GITHUB_OAUTH_CLIENT_ID) ||
-    cleanEnvValue(env.GITHUB_CLIENT_ID);
+    cleanEnvValue(env.GITHUB_CLIENT_ID) ||
+    GITHUB_OAUTH_CLIENT_ID_FALLBACK;
 
   const secret =
     cleanEnvValue(env.GITHUB_OAUTH_SECRET) ||
@@ -98,7 +101,7 @@ const handleAuth = async (url: URL, env: Env) => {
 
 	const oauth2 = createOAuth(env);
 	const authorizationUri = oauth2.authorizeURL({
-		redirect_uri: `https://${url.hostname}/callback`,
+		redirect_uri: `https://${url.hostname}/callback?provider=github`,
 		scope: repoScope,
 		state: randomHex(4), // 4 bytes -> 8 hex chars
 	});
@@ -161,7 +164,7 @@ const handleCallback = async (url: URL, env: Env) => {
 	const oauth2 = createOAuth(env);
 	const accessToken = await oauth2.getToken({
 		code,
-		redirect_uri: `https://${url.hostname}/callback`,
+		redirect_uri: `https://${url.hostname}/callback?provider=github`,
 	});
 	return callbackScriptResponse('success', accessToken);
 };
