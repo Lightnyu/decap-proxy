@@ -43,7 +43,13 @@ export class OAuthClient {
 			}),
 		});
 
-		const json = (await response.json()) as { access_token: string };
+		const json = (await response.json()) as { access_token?: string; error?: string; error_description?: string };
+
+		if (!response.ok || !json.access_token) {
+			const message = json.error_description || json.error || `GitHub OAuth token exchange failed with status ${response.status}`;
+			throw new Error(message);
+		}
+
 		return json.access_token;
 	}
 }
