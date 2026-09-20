@@ -47,3 +47,11 @@ describe('OAuth redirect URI', () => {
 		}
 	});
 });
+
+
+describe('OAuth environment sanitising', () => {
+	it('keeps the worker from ever constructing client_id=undefined', async () => {
+		const response = await SELF.fetch('https://example.com/auth?provider=github');
+		expect(response.url).not.toContain('client_id=undefined');
+	});
+});
