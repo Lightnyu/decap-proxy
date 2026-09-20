@@ -100,7 +100,7 @@ const handleAuth = async (url: URL, env: Env) => {
 
 	const oauth2 = createOAuth(env);
 	const authorizationUri = oauth2.authorizeURL({
-		redirect_uri: `https://${url.hostname}/callback`,
+		redirect_uri: `https://${url.hostname}/callback?provider=github`,
 		scope: repoScope,
 		state: randomHex(4), // 4 bytes -> 8 hex chars
 	});
@@ -162,7 +162,7 @@ const handleCallback = async (url: URL, env: Env) => {
 	const oauth2 = createOAuth(env);
 	const accessToken = await oauth2.getToken({
 		code,
-		redirect_uri: `https://${url.hostname}/callback`,
+		redirect_uri: `https://${url.hostname}/callback?provider=github`,
 	});
 	return callbackScriptResponse('success', accessToken);
 };
