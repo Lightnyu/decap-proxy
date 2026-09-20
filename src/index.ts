@@ -17,12 +17,14 @@ function randomHex(bytes: number): string {
 		.join('');
 }
 
+const GITHUB_OAUTH_CLIENT_ID_FALLBACK = 'Ov23Ii3SQqSOZU16Wjcw';
+
 const getOAuthConfig = (env: Env) => {
   const id =
     env.GITHUB_OAUTH_ID ||
     env.GITHUB_OAUTH_CLIENT_ID ||
     env.GITHUB_CLIENT_ID ||
-    '';
+    GITHUB_OAUTH_CLIENT_ID_FALLBACK;
 
   const secret =
     env.GITHUB_OAUTH_SECRET ||
@@ -79,7 +81,6 @@ const createOAuth = (env: Env) => {
 const handleAuth = async (url: URL, env: Env) => {
   const { id, secret } = getOAuthConfig(env);
   const missing = [];
-  if (!id) missing.push('GITHUB_OAUTH_ID');
   if (!secret) missing.push('GITHUB_OAUTH_SECRET');
   if (missing.length) return configErrorResponse(missing);
 
@@ -130,7 +131,6 @@ const callbackScriptResponse = (status: string, token: string) => {
 const handleCallback = async (url: URL, env: Env) => {
   const { id, secret } = getOAuthConfig(env);
   const missing = [];
-  if (!id) missing.push('GITHUB_OAUTH_ID');
   if (!secret) missing.push('GITHUB_OAUTH_SECRET');
   if (missing.length) return configErrorResponse(missing);
 
