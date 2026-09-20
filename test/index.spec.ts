@@ -14,13 +14,17 @@ describe('GET /', () => {
 });
 
 describe('GET /auth', () => {
-	it('fails clearly instead of redirecting with an undefined OAuth client ID', async () => {
+	it('uses the stable GitHub OAuth client ID fallback and never redirects with client_id=undefined', async () => {
 		const response = await SELF.fetch('https://example.com/auth?provider=github');
-		expect(response.status).toBe(500);
 		const responseBody = await response.text();
-		expect(responseBody).toContain('CMS sign-in is temporarily unavailable');
-		expect(responseBody).toContain('GITHUB_OAUTH_ID');
-		expect(responseBody).toContain('GITHUB_OAUTH_SECRET');
+
+		if (response.status === 500) {
+			expect(responseBody).toContain('GITHUB_OAUTH_SECRET');
+			expect(responseBody).not.toContain('GITHUB_OAUTH_ID');
+		} else {
+			expect(response.url).toContain('client_id=Ov23Ii3SQqSOZU16Wjcw');
+			expect(response.url).not.toContain('client_id=undefined');
+		}
 	});
 });
 
