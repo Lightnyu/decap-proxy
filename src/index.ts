@@ -159,7 +159,7 @@ const callbackScriptResponse = (status: string, token: string) => {
     '  window.opener.postMessage("authorizing:github", editorOrigin);',
     '}());',
     '</script></body></html>'
-  ].join('\\n');
+  ].join('\n');
   return new Response(html, {
     headers: {
       'Content-Type': 'text/html; charset=UTF-8',
