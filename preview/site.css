@@ -349,3 +349,17 @@ footer{background:#121b13;color:#f7f4ea;padding:clamp(38px,5.6vw,85px) 0 24px}
 @media(max-width:750px){.facilities-preview .facilities-photos{aspect-ratio:1.6}.facilities-preview .facilities-copy{order:0}.disciplines{grid-template-columns:1fr;gap:18px}.disciplines>div{padding-top:13px}.concise-terms .wrap{display:block}.concise-terms .actions{justify-content:flex-start;margin-top:23px}.harvest-layout{grid-template-columns:1fr;gap:24px}.harvest-share{padding:25px}.harvest-value{font-size:clamp(6.5rem,25vw,9rem)}.retire-well .docs .actions{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:640px){.facilities-preview .facilities-photos{aspect-ratio:1.45}.facilities-preview .facilities-gallery figcaption{font-size:.66rem}.facilities-preview .actions .btn{width:100%}.farmer-actions .btn{width:100%}.concise-terms .actions .btn{white-space:normal;width:100%}.retire-well .docs .actions{grid-template-columns:1fr}.retire-well .docs .button-widget a{min-height:50px}.harvest-options h2{font-size:clamp(2.8rem,10vw,4rem)}.retire-well .sequence .cells-3>div{padding:15px 3px}.mobile-convert .btn{font-size:.83rem;padding-inline:10px}.research-tile h3{font-size:2rem}}
 @media(prefers-reduced-motion:reduce){.research-gallery .tiles article,.research-tile img{transition:none}}
+
+/* Public viewer: native no-JS accessible mobile navigation */
+.mobile-nav{display:none}
+@media(max-width:850px){
+.header-inner>.menu{display:none!important}
+.mobile-nav{display:block;margin-left:auto}
+.mobile-nav summary{display:flex;align-items:center;gap:10px;cursor:pointer;list-style:none;padding:11px 6px;font:650 .85rem/1.2 var(--sans);color:var(--forest)}
+.mobile-nav summary::-webkit-details-marker{display:none}
+.mobile-nav summary span{font-size:1.35rem}
+.mobile-nav .preview-mobile-nav{display:none!important;position:absolute;top:var(--header);left:0;right:0;z-index:32;padding:13px clamp(22px,5vw,52px) 22px;background:var(--paper);box-shadow:0 16px 30px #111b1433;max-height:calc(100dvh - var(--header));overflow:auto}
+.mobile-nav[open] .preview-mobile-nav{display:grid!important;gap:0}
+.mobile-nav .preview-mobile-nav>a{display:flex!important;align-items:center;min-height:46px;padding:11px 2px;border-top:1px solid var(--line);text-decoration:none;font-size:.92rem}
+.mobile-nav .preview-mobile-nav>a.btn{padding:12px 15px;margin-top:13px;justify-content:center}
+}
